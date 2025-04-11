@@ -7,13 +7,15 @@ const { verifyToken } = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // Register a new user
-router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+router.post('/register', async (req, res) => {      
+  const { email, password, role } = req.body;
 
-  // Issue: Password should be hashed before saving
+  // Issue: Password should be hashed before saving(fixed)
+  const hashedPassword = await bcrypt.hash(password,10)
   const newUser = new User({
-    username,
-    password, // Not hashed
+    email,
+    password:hashedPassword, // Not hashed(fixed)
+    role,
   });
 
   try {
@@ -24,17 +26,31 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  res.status(200).json({ message: 'Welcome to the authentication API!' });
+});
+
 // Login route
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ email });
 
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid credentials - user not found' });
+  }
   // Issue: No password comparison (should hash password and compare)
-  if (!user || user.password !== password) { // Incorrect password check
+  // if (!user || user.password !== password) { // Incorrect password check
+  //   return res.status(401).json({ message: 'Invalid credentials' });
+  // }
+
+  // fixed code 
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
+  //Generating JWT if password matches
   const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
   res.json({ token });

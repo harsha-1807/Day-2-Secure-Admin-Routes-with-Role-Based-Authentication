@@ -8,9 +8,27 @@ function Home() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLogin, setIsLogin] = useState(true); // Toggle between login and register form
 
+  // const handleRegister = async () => {
+  //   try {
+  //     const response = await axios.post("http://localhost:5000/register", {
+  //       email,
+  //       password,
+  //       role
+  //     });
+  //     alert('Registration successful!');
+  //     setEmail('');
+  //     setPassword('');
+  //     setRole('user');
+  //     console.log(response.data);
+      
+  //   } catch (error) {
+  //     setErrorMessage(error.response.data || "Registration failed");
+  //   }
+  // };
+
   const handleRegister = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", {
+      const response = await axios.post("http://localhost:5000/register", {
         email,
         password,
         role
@@ -19,23 +37,40 @@ function Home() {
       setEmail('');
       setPassword('');
       setRole('user');
+      console.log(response.data);
     } catch (error) {
-      setErrorMessage(error.response.data || "Registration failed");
+      setErrorMessage(error.response?.data?.message || "Registration failed");
     }
   };
-
+  
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/login", {
+      const response = await axios.post("http://localhost:5000/login", {
         email,
-        password
+        password,
+        role
       });
       localStorage.setItem("token", response.data.token);
-      window.location.href = '/admin/dashboard'; // Redirect to admin dashboard after login
+      window.location.href = '/admin/dashboard';
+      console.log(response.data.role);
     } catch (error) {
-      setErrorMessage(error.response.data || "Login failed");
+      setErrorMessage(error.response?.data?.message || "Login failed");
     }
   };
+  
+
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await axios.post("http://localhost:5000/login", {
+  //       email,
+  //       password
+  //     });
+  //     localStorage.setItem("token", response.data.token);
+  //     window.location.href = '/admin/dashboard'; // Redirect to admin dashboard after login
+  //   } catch (error) {
+  //     setErrorMessage(error.response.data || "Login failed");
+  //   }
+  // };
 
   return (
     <div>

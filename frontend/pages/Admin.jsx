@@ -38,6 +38,12 @@ function Admin() {
     fetchDashboardData();
   }, []);
 
+  
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = "/";
+  };
+
   return (
     <div>
       <h1>Admin Dashboard</h1>
@@ -52,6 +58,8 @@ function Admin() {
           <p>{content}</p>
         </div>
       )}
+      
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
